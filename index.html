@@ -1,0 +1,713 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>技能互换</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&display=swap">
+<style>
+/* 布局概念：一张“交换所”的工作台——顶部导航，下方单列分屏；灰绿为底，松绿是“我能教”，琥珀是“我想学”。 */
+:root{
+  color-scheme: light;
+  /* 色彩 */
+  --bg:#F4F6F1;
+  --surface:#FFFFFF;
+  --surface-2:#EAF0E9;
+  --ink:#1B241E;
+  --ink-2:#4F5D54;
+  --ink-3:#86938A;
+  --pine:#1E6B4F;
+  --pine-deep:#124A36;
+  --pine-tint:#DCE9DF;
+  --amber:#A35F0E;
+  --amber-soft:#F6E7CB;
+  --amber-bright:#F2B45C;
+  --line:#DDE4DC;
+  --shadow:0 1px 2px rgba(27,36,30,.06),0 8px 24px rgba(27,36,30,.07);
+  /* 字体 */
+  --font-display:"Fraunces","Source Han Serif SC","Songti SC","Noto Serif SC","SimSun",serif;
+  --font-ui:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC","Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --bg:#0E1510;
+    --surface:#161F18;
+    --surface-2:#1E2B22;
+    --ink:#E7EEE8;
+    --ink-2:#A4B2A8;
+    --ink-3:#6E7C72;
+    --pine:#5FC08A;
+    --pine-deep:#8AD8AA;
+    --pine-tint:#1D3A29;
+    --amber:#E7A44C;
+    --amber-soft:#3A2A14;
+    --amber-bright:#F2B45C;
+    --line:#29362D;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#0E1510;
+  --surface:#161F18;
+  --surface-2:#1E2B22;
+  --ink:#E7EEE8;
+  --ink-2:#A4B2A8;
+  --ink-3:#6E7C72;
+  --pine:#5FC08A;
+  --pine-deep:#8AD8AA;
+  --pine-tint:#1D3A29;
+  --amber:#E7A44C;
+  --amber-soft:#3A2A14;
+  --amber-bright:#F2B45C;
+  --line:#29362D;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--font-ui);
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.6;
+  font-size:15px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1080px;margin:0 auto}
+
+/* ===== 顶栏 ===== */
+.topbar{
+  position:sticky;top:0;z-index:50;
+  background:color-mix(in srgb,var(--bg) 86%,transparent);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+}
+.topbar::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.top-inner{padding-block:12px 10px;display:flex;flex-direction:column;gap:10px}
+.top-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
+.logo{width:34px;height:34px;flex:none;display:block}
+.brand-word{display:flex;flex-direction:column;line-height:1.1}
+.brand-cn{font-weight:800;font-size:19px;letter-spacing:.5px}
+.brand-en{font-family:var(--font-display);font-size:11px;letter-spacing:.16em;color:var(--ink-3);text-transform:uppercase}
+.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  appearance:none;border:0;background:transparent;cursor:pointer;
+  font:inherit;font-weight:600;color:var(--ink-2);
+  padding:7px 14px;border-radius:999px;white-space:nowrap;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.tab:hover{background:var(--surface-2);color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--pine-tint);color:var(--pine-deep)}
+.tab .cnt{font-family:var(--font-display);font-variant-numeric:tabular-nums;font-size:12px;background:var(--pine);color:#fff;border-radius:999px;padding:0 7px;line-height:17px}
+.btn{
+  appearance:none;border:0;cursor:pointer;font:inherit;font-weight:700;
+  padding:9px 16px;border-radius:10px;display:inline-flex;align-items:center;gap:7px;
+  transition:transform .12s ease,background .12s ease;
+}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--pine);color:#fff}
+.btn-primary:hover{background:var(--pine-deep)}
+.btn-ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.btn-ghost:hover{border-color:var(--ink-3)}
+.btn-amber{background:var(--amber);color:#fff}
+.btn-amber:hover{background:#8A4E09}
+.btn-sm{padding:6px 12px;font-size:13px;border-radius:8px}
+.btn-block{width:100%;justify-content:center}
+
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:2px solid var(--amber-bright);outline-offset:2px;border-radius:6px;
+}
+
+/* ===== 英雄区 ===== */
+.hero{padding-block:44px 20px;display:grid;grid-template-columns:1.25fr 1fr;gap:36px;align-items:center}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;color:var(--pine);text-transform:uppercase;margin:0 0 12px}
+h1{font-family:var(--font-display);font-weight:700;font-size:clamp(30px,5vw,46px);line-height:1.12;margin:0 0 14px;color:var(--ink);text-wrap:balance;letter-spacing:.5px}
+h1 em{font-style:normal;color:var(--pine)}
+.hero-sub{color:var(--ink-2);font-size:16px;max-width:56ch;margin:0 0 22px}
+.hero-cta{display:flex;gap:10px;flex-wrap:wrap}
+.swap-stage{display:flex;flex-direction:column;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:var(--shadow)}
+.swap-stage-cap{font-size:12px;color:var(--ink-3);font-weight:600;letter-spacing:.06em;display:flex;justify-content:space-between}
+.swap-pair{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.pill{display:flex;flex-direction:column;gap:3px;padding:12px 14px;border-radius:12px;min-width:0;flex:1}
+.pill-teach{background:var(--pine-tint)}
+.pill-learn{background:var(--amber-soft)}
+.pill .lbl{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--ink-2)}
+.pill .val{font-weight:700;font-size:16px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill-teach .lbl{color:var(--pine-deep)}
+.pill-learn .lbl{color:var(--amber)}
+.swap-arrows{flex:none;display:flex;align-items:center}
+.swap-arrows svg{width:28px;height:28px;color:var(--ink-3);animation:spin-in .9s ease both}
+.swap-stage-note{font-size:13px;color:var(--ink-2);border-top:1px dashed var(--line);padding-top:12px;margin:0;display:flex;gap:8px;align-items:baseline}
+.swap-stage-note b{color:var(--pine-deep);white-space:nowrap}
+@keyframes spin-in{from{transform:rotate(0)}to{transform:rotate(180deg)}}
+@media (prefers-reduced-motion: reduce){
+  .swap-arrows svg{animation:none}
+  .btn{transition:none}
+}
+
+/* ===== 怎么换 ===== */
+.how{padding-block:18px 6px}
+.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
+.how-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px}
+.how-num{font-family:var(--font-display);font-weight:700;font-size:26px;color:var(--pine);line-height:1}
+.how-card h3{margin:10px 0 4px;font-size:15px;color:var(--ink)}
+.how-card p{margin:0;font-size:13px;color:var(--ink-2)}
+.coin-note{display:flex;gap:12px;align-items:flex-start;background:var(--amber-soft);border:1px solid transparent;border-radius:14px;padding:14px 16px;margin-top:16px;font-size:14px;color:var(--ink)}
+.coin-note .coin{font-size:18px;line-height:1.2}
+.coin-note b{color:var(--amber)}
+
+/* ===== 分区标题 ===== */
+.section{margin-top:34px}
+.section-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+.section-title{font-family:var(--font-display);font-weight:700;font-size:24px;margin:0;color:var(--ink);letter-spacing:.5px}
+.section-sub{color:var(--ink-2);font-size:13px;margin:4px 0 14px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);font:inherit;font-size:13px;font-weight:600;padding:6px 13px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.chip:hover{border-color:var(--ink-3);color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+/* ===== 技能网格 ===== */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px;position:relative}
+.card:hover{border-color:var(--ink-3);box-shadow:var(--shadow)}
+.badge{position:absolute;top:14px;right:14px;font-size:11px;font-weight:700;letter-spacing:.04em;padding:3px 9px;border-radius:999px}
+.badge-teach{background:var(--pine-tint);color:var(--pine-deep)}
+.badge-learn{background:var(--amber-soft);color:var(--amber)}
+.owner{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-2)}
+.owner .av{width:26px;height:26px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-size:14px}
+.skill-title{font-weight:700;font-size:17px;color:var(--ink);margin:0;padding-right:52px;line-height:1.3}
+.meta{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:12px;color:var(--ink-2);background:var(--surface-2);border-radius:7px;padding:2px 8px}
+.tag-cat{background:var(--pine-tint);color:var(--pine-deep)}
+.card-foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between}
+.want{font-size:12px;color:var(--ink-3)}
+
+/* ===== 匹配 ===== */
+.match-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:14px}
+.match-card.swap{border-left:4px solid var(--pine)}
+.match-card.coin{border-left:4px solid var(--amber-bright)}
+.match-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.match-type{font-weight:700;font-size:13px;letter-spacing:.03em}
+.swap .match-type{color:var(--pine-deep)}
+.coin .match-type{color:var(--amber)}
+.match-person{display:flex;align-items:center;gap:10px}
+.match-person .av{width:40px;height:40px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-size:20px}
+.match-person .nm{font-weight:700;color:var(--ink)}
+.match-person .bio{font-size:12px;color:var(--ink-2)}
+.exchange{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--surface-2);border-radius:12px;padding:12px 14px;font-size:14px}
+.exchange .from{color:var(--pine-deep);font-weight:700}
+.exchange .to{color:var(--amber);font-weight:700}
+.exchange .arr{color:var(--ink-3);flex:none}
+.match-why{font-size:13px;color:var(--ink-2);margin:0}
+.match-actions{display:flex;gap:8px;flex-wrap:wrap}
+.empty{padding:40px 16px;text-align:center;border:1px dashed var(--line);border-radius:16px;color:var(--ink-2)}
+.empty b{color:var(--ink)}
+
+/* ===== 表单 ===== */
+.form-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:24px;max-width:640px;box-shadow:var(--shadow)}
+.field{margin-bottom:18px}
+.field label{display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:var(--ink)}
+.seg{display:inline-flex;background:var(--surface-2);border-radius:10px;padding:3px;gap:3px}
+.seg button{appearance:none;border:0;background:transparent;font:inherit;font-weight:700;font-size:14px;padding:8px 18px;border-radius:8px;cursor:pointer;color:var(--ink-2)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.seg button[data-dir="teach"][aria-pressed="true"]{color:var(--pine-deep)}
+.seg button[data-dir="learn"][aria-pressed="true"]{color:var(--amber)}
+input[type="text"],select,textarea{
+  width:100%;font:inherit;font-size:15px;color:var(--ink);background:var(--surface);
+  border:1px solid var(--line);border-radius:10px;padding:10px 12px;
+}
+input[type="text"]:focus,select:focus,textarea:focus{outline:2px solid var(--amber-bright);outline-offset:0;border-color:transparent}
+textarea{min-height:88px;resize:vertical}
+.hint{font-size:12px;color:var(--ink-3);margin-top:5px}
+
+/* ===== 我的 ===== */
+.me-head{display:flex;gap:16px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px;margin-top:16px}
+.me-head .av{width:56px;height:56px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-size:28px;flex:none}
+.me-head h2{margin:0;font-size:20px}
+.me-head p{margin:2px 0 0;color:var(--ink-2);font-size:13px}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px}
+.stat .n{font-family:var(--font-display);font-weight:700;font-size:28px;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1}
+.stat .l{font-size:12px;color:var(--ink-2);margin-top:6px}
+.own-list{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.own-item{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.own-item .t{font-weight:700}
+.own-item .m{font-size:12px;color:var(--ink-2)}
+.del{appearance:none;border:0;background:transparent;color:var(--ink-3);cursor:pointer;font-size:18px;line-height:1;padding:4px 8px;border-radius:8px}
+.del:hover{color:#C0392B;background:var(--surface-2)}
+
+/* ===== 页脚 ===== */
+footer{border-top:1px solid var(--line);margin-top:48px;padding:26px 0 40px;color:var(--ink-2);font-size:13px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+footer .brand-en{font-family:var(--font-display);color:var(--ink-3);letter-spacing:.16em;text-transform:uppercase}
+
+/* ===== toast ===== */
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:12px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:100;box-shadow:var(--shadow);max-width:calc(100vw - 32px);text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.hidden{display:none !important}
+
+/* ===== 响应式 ===== */
+@media (max-width:820px){
+  .hero{grid-template-columns:1fr;padding-block:30px 10px;gap:22px}
+  .how-grid{grid-template-columns:1fr}
+  .stat-row{grid-template-columns:1fr 1fr 1fr}
+}
+@media (max-width:440px){
+  .stat-row{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap top-inner">
+    <div class="top-row">
+      <a class="brand" href="#" onclick="switchView('explore');return false">
+        <svg class="logo" viewBox="0 0 40 40" aria-hidden="true">
+          <rect x="2" y="2" width="36" height="36" rx="10" fill="var(--pine)"/>
+          <path d="M12 20h10m0 0l-4-4m4 4l-4 4" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M28 20H18m0 0l4-4m-4 4l4 4" stroke="var(--amber-bright)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        <span class="brand-word">
+          <span class="brand-cn">技能互换</span>
+          <span class="brand-en">Skill Swap</span>
+        </span>
+      </a>
+      <button class="btn btn-primary" onclick="switchView('publish')">＋ 发布技能</button>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button class="tab" data-view="explore" aria-selected="true" onclick="switchView('explore')">广场</button>
+      <button class="tab" data-view="matches" aria-selected="false" onclick="switchView('matches')">匹配 <span class="cnt" id="matchCnt">0</span></button>
+      <button class="tab" data-view="me" aria-selected="false" onclick="switchView('me')">我的</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- 广场 -->
+  <section id="view-explore">
+    <div class="hero">
+      <div>
+        <p class="eyebrow">技能互换平台</p>
+        <h1>用你<em>会教的</em>，<br>换你<em>想学的</em>。</h1>
+        <p class="hero-sub">报班太贵，自学难坚持。把你的一技之长拿出来，和别人交换另一种可能——不花钱，只交换。</p>
+        <div class="hero-cta">
+          <button class="btn btn-primary" onclick="switchView('publish');setDir('teach')">发布我能教的</button>
+          <button class="btn btn-amber" onclick="switchView('publish');setDir('learn')">发布我想学的</button>
+        </div>
+      </div>
+      <div class="swap-stage">
+        <div class="swap-stage-cap"><span>一次互换</span><span id="swapStageWho">正在匹配…</span></div>
+        <div class="swap-pair" id="swapStage">
+          <div class="pill pill-teach"><span class="lbl">我能教 ↗</span><span class="val">Python</span></div>
+          <div class="swap-arrows" aria-hidden="true">
+            <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 11h20m0 0l-5-5m5 5l-5 5"/><path d="M26 21H6m0 0l5-5m-5 5l5 5"/></svg>
+          </div>
+          <div class="pill pill-learn"><span class="lbl">我想学 ↙</span><span class="val">吉他</span></div>
+        </div>
+        <p class="swap-stage-note">找到了 <b id="swapStageNote">—</b> 位可以互相教学的人</p>
+      </div>
+    </div>
+
+    <div class="how">
+      <h2 class="section-title">怎么换</h2>
+      <div class="how-grid">
+        <div class="how-card"><div class="how-num">壹</div><h3>发布</h3><p>写下你能教的、想学的：技能、水平、标签，让别人能找到你。</p></div>
+        <div class="how-card"><div class="how-num">贰</div><h3>匹配</h3><p>系统算出谁能和你直接互换，谁需要用技能币来撮合。</p></div>
+        <div class="how-card"><div class="how-num">叁</div><h3>交换</h3><p>约个时间线上一对一；技能对不上时，用技能币完成单向学习。</p></div>
+      </div>
+      <div class="coin-note">
+        <span class="coin">🪙</span>
+        <span>不是每次都刚好互相需要。你<strong>教</strong>别人一次，赚一枚<strong>技能币</strong>；攒够了，再拿去<strong>学</strong>你想学的——让交换不再卡在“刚好互相需要”上。</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2 class="section-title">技能广场</h2>
+        <span class="section-sub" id="exploreCount"></span>
+      </div>
+      <div class="chips" id="dirFilter">
+        <button class="chip" aria-pressed="true" data-dir="all" onclick="setDirFilter('all')">全部</button>
+        <button class="chip" aria-pressed="false" data-dir="teach" onclick="setDirFilter('teach')">我能教的</button>
+        <button class="chip" aria-pressed="false" data-dir="learn" onclick="setDirFilter('learn')">我想学的</button>
+        <button class="chip" aria-pressed="false" data-cat="编程" onclick="setCatFilter('编程')">编程</button>
+        <button class="chip" aria-pressed="false" data-cat="音乐" onclick="setCatFilter('音乐')">音乐</button>
+        <button class="chip" aria-pressed="false" data-cat="艺术" onclick="setCatFilter('艺术')">艺术</button>
+        <button class="chip" aria-pressed="false" data-cat="语言" onclick="setCatFilter('语言')">语言</button>
+        <button class="chip" aria-pressed="false" data-cat="运动" onclick="setCatFilter('运动')">运动</button>
+        <button class="chip" aria-pressed="false" data-cat="生活" onclick="setCatFilter('生活')">生活</button>
+      </div>
+      <div class="grid" id="exploreGrid"></div>
+    </div>
+  </section>
+
+  <!-- 匹配 -->
+  <section id="view-matches" class="section hidden">
+    <h2 class="section-title">我的匹配</h2>
+    <p class="section-sub">按“能不能互相教”排序：先看能直接互换的人，再看能用技能币撮合的人。</p>
+    <div id="matchesList" style="display:flex;flex-direction:column;gap:14px"></div>
+  </section>
+
+  <!-- 发布 -->
+  <section id="view-publish" class="section hidden">
+    <h2 class="section-title">发布技能</h2>
+    <p class="section-sub">发布后会自动进入匹配和广场。</p>
+    <form class="form-card" id="publishForm" onsubmit="submitPublish(event)">
+      <div class="field">
+        <label>方向</label>
+        <div class="seg" id="dirSeg">
+          <button type="button" data-dir="teach" aria-pressed="true" onclick="setDir('teach')">↗ 我能教</button>
+          <button type="button" data-dir="learn" aria-pressed="false" onclick="setDir('learn')">↙ 我想学</button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="pTitle">技能名称</label>
+        <input type="text" id="pTitle" placeholder="例如：吉他、Python、人像摄影" required>
+      </div>
+      <div class="field">
+        <label for="pCat">分类</label>
+        <select id="pCat" required></select>
+      </div>
+      <div class="field">
+        <label for="pLevel">水平</label>
+        <select id="pLevel" required></select>
+      </div>
+      <div class="field">
+        <label for="pTags">标签（用逗号分隔）</label>
+        <input type="text" id="pTags" placeholder="例如：指弹、和弦、零基础">
+        <div class="hint">可选，最多 3 个。</div>
+      </div>
+      <div class="field">
+        <label for="pDesc">一句话介绍</label>
+        <textarea id="pDesc" placeholder="你想怎么教 / 想学到什么程度"></textarea>
+      </div>
+      <button class="btn btn-primary btn-block" type="submit">发布</button>
+    </form>
+  </section>
+
+  <!-- 我的 -->
+  <section id="view-me" class="section hidden">
+    <h2 class="section-title">我的主页</h2>
+    <div class="me-head">
+      <div class="av">🧭</div>
+      <div>
+        <h2>我</h2>
+        <p>这是你的演示身份。发布、删除技能都会实时更新匹配。</p>
+      </div>
+    </div>
+    <div class="stat-row">
+      <div class="stat"><div class="n" id="statTeach">0</div><div class="l">我能教的技能</div></div>
+      <div class="stat"><div class="n" id="statLearn">0</div><div class="l">我想学的技能</div></div>
+      <div class="stat"><div class="n" id="statMatch">0</div><div class="l">可互换 / 可撮合</div></div>
+    </div>
+    <h3 style="font-size:15px;margin:24px 0 0">我能教的</h3>
+    <div class="own-list" id="ownTeach"></div>
+    <h3 style="font-size:15px;margin:24px 0 0">我想学的</h3>
+    <div class="own-list" id="ownLearn"></div>
+  </section>
+
+</main>
+
+<footer class="wrap">
+  <span>技能互换 · Skill Swap — 高保真交互原型，示例数据仅供演示。</span>
+  <span class="brand-en">Teach one, learn one.</span>
+</footer>
+
+<div id="toast" role="status"></div>
+
+<script>
+(function(){
+"use strict";
+/* ===== 数据 ===== */
+var CATS = ['编程','音乐','艺术','语言','运动','生活'];
+var LEVELS = ['入门','进阶','精通'];
+var ME_KEY = 'huhuan-me-v1';
+function s(t,c,l,tags){ return {t:t,c:c,l:l,tags:tags||[]}; }
+
+var SEED = [
+  {id:'u1',name:'林小满',avatar:'🎸',bio:'自学吉他三年，想转行做数据分析',
+   teach:[s('吉他','音乐','入门',['指弹','和弦'])],
+   learn:[s('Python','编程','入门',['自动化'])]},
+  {id:'u2',name:'大熊',avatar:'📷',bio:'前产品经理，转行做独立摄影',
+   teach:[s('摄影','艺术','进阶',['人像','构图','打光'])],
+   learn:[s('Python','编程','入门',['爬虫'])]},
+  {id:'u3',name:'阿哲',avatar:'🎤',bio:'乐队吉他手，想学拍照记录演出',
+   teach:[s('吉他','音乐','进阶',['即兴','扒谱']), s('尤克里里','音乐','入门',['弹唱'])],
+   learn:[s('摄影','艺术','入门',['手机摄影'])]},
+  {id:'u4',name:'苏苏',avatar:'🗻',bio:'日语专业，N1 在读',
+   teach:[s('日语','语言','进阶',['口语','N1'])],
+   learn:[s('水彩画','艺术','入门',['风景'])]},
+  {id:'u5',name:'陈老师',avatar:'🎨',bio:'中学美术老师，业余学日语',
+   teach:[s('水彩画','艺术','精通',['风景','静物'])],
+   learn:[s('日语','语言','入门',['五十音'])]},
+  {id:'u6',name:'小叶',avatar:'🏃',bio:'尤克里里爱好者，跑步四年',
+   teach:[s('尤克里里','音乐','入门',['弹唱'])],
+   learn:[s('马拉松','运动','入门',['配速'])]},
+  {id:'u7',name:'老周',avatar:'📊',bio:'十年数据分析师，想学粤语',
+   teach:[s('数据分析','编程','进阶',['Excel','SQL'])],
+   learn:[s('粤语','语言','入门',['日常会话'])]},
+  {id:'u8',name:'Mia',avatar:'🥐',bio:'法语专业，烘焙新手',
+   teach:[s('法语','语言','进阶',['口语','语法'])],
+   learn:[s('烘焙','生活','入门',['面包'])]}
+];
+
+var DEFAULT_ME = {
+  name:'我', avatar:'🧭',
+  teach:[s('Python','编程','进阶',['数据分析','自动化'])],
+  learn:[s('吉他','音乐','入门',['指弹']), s('摄影','艺术','入门',['手机摄影'])]
+};
+
+/* ===== 状态 ===== */
+var me = loadMe();
+var dir = 'teach';
+var dirFilter = 'all';
+var catFilter = null;
+
+function loadMe(){
+  try{
+    var raw = localStorage.getItem(ME_KEY);
+    if(raw){ var p = JSON.parse(raw); if(p && p.teach && p.learn) return p; }
+  }catch(e){}
+  return JSON.parse(JSON.stringify(DEFAULT_ME));
+}
+function saveMe(){
+  try{ localStorage.setItem(ME_KEY, JSON.stringify(me)); }catch(e){}
+}
+
+/* ===== 匹配引擎 ===== */
+function norm(t){ return String(t||'').trim(); }
+function inter(a,b){
+  return a.filter(function(x){
+    return b.some(function(y){ return norm(y.t) === norm(x.t); });
+  });
+}
+function matchWith(other){
+  var iTeach = inter(me.teach, other.learn);
+  var theyTeach = inter(other.teach, me.learn);
+  if(iTeach.length && theyTeach.length){
+    return {type:'swap', score:3, other:other, give:iTeach, get:theyTeach};
+  }else if(theyTeach.length){
+    return {type:'coin-get', score:2, other:other, give:[], get:theyTeach};
+  }else if(iTeach.length){
+    return {type:'coin-give', score:1, other:other, give:iTeach, get:[]};
+  }
+  return null;
+}
+function computeMatches(){
+  return SEED.map(matchWith).filter(Boolean)
+    .sort(function(a,b){ return b.score - a.score; });
+}
+
+/* ===== 渲染工具 ===== */
+function el(id){ return document.getElementById(id); }
+function esc(v){ return String(v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+function skillCardHTML(sk, owner, isMe){
+  var badge = sk.d === 'teach'
+    ? '<span class="badge badge-teach">↗ 我能教</span>'
+    : '<span class="badge badge-learn">↙ 我想学</span>';
+  var tags = sk.c ? '<span class="tag tag-cat">'+esc(sk.c)+'</span>' : '';
+  tags += sk.l ? '<span class="tag">'+esc(sk.l)+'</span>' : '';
+  (sk.tags||[]).slice(0,3).forEach(function(t){ tags += '<span class="tag">'+esc(t)+'</span>'; });
+  var name = isMe ? '我' : owner.name;
+  var av = isMe ? '🧭' : owner.avatar;
+  return '<article class="card">'+badge+
+    '<div class="owner"><span class="av">'+av+'</span>'+esc(name)+'<span class="want">· '+(isMe?'你的发布':esc(owner.bio||''))+'</span></div>'+
+    '<h3 class="skill-title">'+esc(sk.t)+'</h3>'+
+    '<div class="meta">'+tags+'</div>'+
+    '<div class="card-foot"><span></span><span class="want">'+(sk.d==='teach'?'可以教你':'想要学')+'</span></div>'+
+    '</article>';
+}
+
+/* ===== 视图切换 ===== */
+function switchView(v){
+  ['explore','matches','publish','me'].forEach(function(k){
+    el('view-'+k).classList.toggle('hidden', k!==v);
+  });
+  document.querySelectorAll('.tab').forEach(function(b){
+    b.setAttribute('aria-selected', b.getAttribute('data-view')===v ? 'true':'false');
+  });
+  if(v==='matches') renderMatches();
+  if(v==='me') renderMe();
+  if(v==='explore') renderExplore();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ===== 广场 ===== */
+function allSkills(){
+  var list = [];
+  me.teach.forEach(function(x){ list.push({d:'teach', s:x, owner:me, isMe:true}); });
+  me.learn.forEach(function(x){ list.push({d:'learn', s:x, owner:me, isMe:true}); });
+  SEED.forEach(function(u){
+    u.teach.forEach(function(x){ list.push({d:'teach', s:x, owner:u, isMe:false}); });
+    u.learn.forEach(function(x){ list.push({d:'learn', s:x, owner:u, isMe:false}); });
+  });
+  return list;
+}
+function renderExplore(){
+  var list = allSkills().filter(function(it){
+    if(dirFilter!=='all' && it.d!==dirFilter) return false;
+    if(catFilter && it.s.c!==catFilter) return false;
+    return true;
+  });
+  el('exploreCount').textContent = '共 '+list.length+' 条 · 演示数据';
+  el('exploreGrid').innerHTML = list.map(function(it){
+    return skillCardHTML({d:it.d, c:it.s.c, l:it.s.l, t:it.s.t, tags:it.s.tags}, it.owner, it.isMe);
+  }).join('');
+}
+function setDirFilter(d){ dirFilter=d; syncChips('dirFilter', d==='all'?'all':d); renderExplore(); }
+function setCatFilter(c){
+  if(catFilter===c){ catFilter=null; } else { catFilter=c; dirFilter='all'; }
+  syncChips('dirFilter', catFilter ? null : 'all');
+  renderExplore();
+}
+function syncChips(id, active){
+  document.querySelectorAll('#'+id+' .chip').forEach(function(b){
+    var on = b.getAttribute('data-dir')===active || b.getAttribute('data-cat')===catFilter;
+    b.setAttribute('aria-pressed', on ? 'true':'false');
+  });
+}
+
+/* ===== 匹配 ===== */
+function renderMatches(){
+  var ms = computeMatches();
+  el('matchCnt').textContent = ms.length;
+  el('statMatch').textContent = ms.length;
+  el('matchesList').innerHTML = ms.map(function(m){
+    var o = m.other;
+    if(m.type==='swap'){
+      var give = m.give.map(function(x){return x.t;}).join('、');
+      var get = m.get.map(function(x){return x.t;}).join('、');
+      return '<article class="match-card swap">'+
+        '<div class="match-top"><span class="match-type">✓ 直接互换</span><button class="btn btn-primary btn-sm" onclick="invite(\''+o.id+'\')">发起互换</button></div>'+
+        '<div class="match-person"><span class="av">'+o.avatar+'</span><div><div class="nm">'+esc(o.name)+'</div><div class="bio">'+esc(o.bio)+'</div></div></div>'+
+        '<div class="exchange"><span class="from">你的 '+esc(give)+'</span><span class="arr">⇄</span><span class="to">TA 的 '+esc(get)+'</span></div>'+
+        '<p class="match-why">你们正好能互相教：你教 TA 想学的，TA 教你想要的。无需技能币，约个时间即可。</p>'+
+        '</article>';
+    }else if(m.type==='coin-get'){
+      var get2 = m.get.map(function(x){return x.t;}).join('、');
+      return '<article class="match-card coin">'+
+        '<div class="match-top"><span class="match-type">🪙 技能币撮合 · TA 能教你</span><button class="btn btn-amber btn-sm" onclick="invite(\''+o.id+'\')">用技能币学</button></div>'+
+        '<div class="match-person"><span class="av">'+o.avatar+'</span><div><div class="nm">'+esc(o.name)+'</div><div class="bio">'+esc(o.bio)+'</div></div></div>'+
+        '<div class="exchange"><span class="to">TA 的 '+esc(get2)+'</span></div>'+
+        '<p class="match-why">TA 会教你想学的，但你没教 TA 想要的。教别人一次赚技能币，就能换这次学习。</p>'+
+        '</article>';
+    }else{
+      var give2 = m.give.map(function(x){return x.t;}).join('、');
+      return '<article class="match-card coin">'+
+        '<div class="match-top"><span class="match-type">🪙 技能币撮合 · 你能教 TA</span><button class="btn btn-amber btn-sm" onclick="invite(\''+o.id+'\')">去赚技能币</button></div>'+
+        '<div class="match-person"><span class="av">'+o.avatar+'</span><div><div class="nm">'+esc(o.name)+'</div><div class="bio">'+esc(o.bio)+'</div></div></div>'+
+        '<div class="exchange"><span class="from">你的 '+esc(give2)+'</span></div>'+
+        '<p class="match-why">TA 想学的正是你会教的。教一次，赚一枚技能币，攒着去学你想学的。</p>'+
+        '</article>';
+    }
+  }).join('') ||
+  '<div class="empty"><b>还没有匹配。</b><br>去「发布」补充你能教的、想学的技能，系统会自动帮你配对。</div>';
+}
+
+/* ===== 我的 ===== */
+function renderMe(){
+  el('statTeach').textContent = me.teach.length;
+  el('statLearn').textContent = me.learn.length;
+  el('statMatch').textContent = computeMatches().length;
+  el('ownTeach').innerHTML = ownHTML('teach', me.teach);
+  el('ownLearn').innerHTML = ownHTML('learn', me.learn);
+}
+function ownHTML(dirKey, arr){
+  if(!arr.length){ return '<div class="empty">还没有「'+(dirKey==='teach'?'我能教':'我想学')+'」的技能，点右上角「发布技能」添加。</div>'; }
+  return arr.map(function(x,i){
+    return '<div class="own-item"><div><div class="t">'+esc(x.t)+'</div><div class="m">'+esc(x.c)+' · '+esc(x.l)+(x.tags&&x.tags.length?' · '+esc(x.tags.join('、')):'')+'</div></div>'+
+      '<button class="del" aria-label="删除" onclick="removeSkill(\''+dirKey+'\','+i+')">×</button></div>';
+  }).join('');
+}
+function removeSkill(dirKey, i){
+  var arr = dirKey==='teach' ? me.teach : me.learn;
+  arr.splice(i,1); saveMe(); renderMe(); renderExplore(); refreshSwapStage();
+  toast('已删除');
+}
+
+/* ===== 发布 ===== */
+function setDir(d){
+  dir = d;
+  document.querySelectorAll('#dirSeg button').forEach(function(b){
+    b.setAttribute('aria-pressed', b.getAttribute('data-dir')===d ? 'true':'false');
+  });
+}
+function submitPublish(e){
+  e.preventDefault();
+  var t = el('pTitle').value.trim();
+  var c = el('pCat').value;
+  var l = el('pLevel').value;
+  var tags = el('pTags').value.split(/[,，、]/).map(function(x){return x.trim();}).filter(Boolean).slice(0,3);
+  if(!t){ toast('请填写技能名称'); return; }
+  var arr = dir==='teach' ? me.teach : me.learn;
+  if(arr.some(function(x){ return norm(x.t)===norm(t); })){ toast('你已经发布过「'+t+'」了'); return; }
+  arr.push(s(t,c,l,tags));
+  saveMe();
+  el('publishForm').reset();
+  setDir('teach');
+  toast('已发布「'+t+'」');
+  refreshSwapStage();
+  switchView(dir==='teach'?'explore':'explore');
+}
+function invite(id){
+  var u = SEED.find(function(x){return x.id===id;});
+  toast('已向 '+(u?u.name:'对方')+' 发出互换邀请（演示）');
+}
+
+/* ===== 英雄区实时互换 ===== */
+function refreshSwapStage(){
+  var ms = computeMatches();
+  var swap = ms.filter(function(m){return m.type==='swap';})[0];
+  var learn = me.learn[0];
+  var teach = me.teach[0];
+  if(swap){
+    el('swapStage').innerHTML =
+      '<div class="pill pill-teach"><span class="lbl">我能教 ↗</span><span class="val">'+esc(swap.give[0].t)+'</span></div>'+
+      '<div class="swap-arrows"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 11h20m0 0l-5-5m5 5l-5 5"/><path d="M26 21H6m0 0l5-5m-5 5l5 5"/></svg></div>'+
+      '<div class="pill pill-learn"><span class="lbl">我想学 ↙</span><span class="val">'+esc(swap.get[0].t)+'</span></div>';
+    el('swapStageWho').textContent = swap.other.name;
+    el('swapStageNote').textContent = ms.length+'';
+  }else{
+    el('swapStage').innerHTML =
+      '<div class="pill pill-teach"><span class="lbl">我能教 ↗</span><span class="val">'+esc(teach?teach.t:'（未填写）')+'</span></div>'+
+      '<div class="swap-arrows"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 11h20m0 0l-5-5m5 5l-5 5"/><path d="M26 21H6m0 0l5-5m-5 5l5 5"/></svg></div>'+
+      '<div class="pill pill-learn"><span class="lbl">我想学 ↙</span><span class="val">'+esc(learn?learn.t:'（未填写）')+'</span></div>';
+    el('swapStageWho').textContent = '待匹配';
+    el('swapStageNote').textContent = '0';
+  }
+}
+
+/* ===== toast ===== */
+var toastTimer;
+function toast(msg){
+  var t = el('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2200);
+}
+
+/* ===== 初始化 ===== */
+function fillSelects(){
+  el('pCat').innerHTML = CATS.map(function(c){return '<option value="'+c+'">'+c+'</option>';}).join('');
+  el('pLevel').innerHTML = LEVELS.map(function(l){return '<option value="'+l+'">'+l+'</option>';}).join('');
+}
+fillSelects();
+renderExplore();
+renderMe();
+refreshSwapStage();
+el('matchCnt').textContent = computeMatches().length;
+})();
+</script>
+</body>
+</html>
