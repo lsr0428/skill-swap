@@ -707,6 +707,15 @@ renderExplore();
 renderMe();
 refreshSwapStage();
 el('matchCnt').textContent = computeMatches().length;
+
+// 内联 onclick/onsubmit 需要在全局作用域找到这些函数，故显式挂到 window 上
+window.switchView = switchView;
+window.setDir = setDir;
+window.setDirFilter = setDirFilter;
+window.setCatFilter = setCatFilter;
+window.invite = invite;
+window.removeSkill = removeSkill;
+window.submitPublish = submitPublish;
 })();
 </script>
 </body>
