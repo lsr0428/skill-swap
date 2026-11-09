@@ -248,6 +248,38 @@ textarea{min-height:88px;resize:vertical}
 footer{border-top:1px solid var(--line);margin-top:48px;padding:26px 0 40px;color:var(--ink-2);font-size:13px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
 footer .brand-en{font-family:var(--font-display);color:var(--ink-3);letter-spacing:.16em;text-transform:uppercase}
 
+/* ===== 信任与安全 ===== */
+.v{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;padding:1px 7px;border-radius:999px}
+.v-yes{background:var(--pine-tint);color:var(--pine-deep)}
+.v-no{background:var(--surface-2);color:var(--ink-3)}
+.report-btn{appearance:none;border:0;background:transparent;cursor:pointer;font:inherit;font-size:12px;color:var(--ink-3);padding:2px 6px;border-radius:6px;white-space:nowrap}
+.report-btn:hover{color:#C0392B;background:var(--surface-2)}
+.m-tools{display:flex;gap:6px;align-items:center}
+.safety{border:1px solid var(--line);border-radius:18px;background:var(--surface);padding:20px;margin-top:20px}
+.safety h3{margin:0 0 4px;font-size:16px;display:flex;align-items:center;gap:8px}
+.safety .lead{color:var(--ink-2);font-size:13px;margin:0 0 14px}
+.safety-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 20px}
+.safety-item{display:flex;gap:10px;font-size:13px;color:var(--ink-2);align-items:flex-start}
+.safety-item .ic{flex:none;font-size:15px;line-height:1.4}
+.safety-item b{color:var(--ink);font-weight:700}
+.safety-item .warn{color:#C0392B;font-weight:600}
+.coin-card{background:var(--amber-soft);border-radius:16px;padding:18px;margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.coin-card .bal{display:flex;align-items:baseline;gap:8px}
+.coin-card .n{font-family:var(--font-display);font-weight:700;font-size:34px;color:var(--amber);line-height:1;font-variant-numeric:tabular-nums}
+.coin-card .l{color:var(--ink);font-weight:700}
+.coin-card .note{font-size:12px;color:var(--ink-2);margin-top:4px}
+/* ===== 弹窗 ===== */
+.modal-backdrop{position:fixed;inset:0;background:rgba(10,16,12,.5);backdrop-filter:blur(3px);z-index:90;display:grid;place-items:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-backdrop.show{opacity:1;pointer-events:auto}
+.modal{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px;max-width:420px;width:100%;box-shadow:var(--shadow);max-height:88vh;overflow:auto}
+.modal h3{margin:0 0 12px;font-size:18px}
+.modal .m-body{font-size:14px;color:var(--ink-2)}
+.modal .m-body b{color:var(--ink)}
+.modal .m-actions{display:flex;gap:10px;margin-top:18px;justify-content:flex-end;flex-wrap:wrap}
+.safety-banner{background:var(--amber-soft);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--ink);display:flex;gap:10px;margin-bottom:6px}
+.safety-banner .ic{flex:none}
+@media (max-width:640px){.safety-grid{grid-template-columns:1fr}}
+
 /* ===== toast ===== */
 #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:12px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:100;box-shadow:var(--shadow);max-width:calc(100vw - 32px);text-align:center}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -331,6 +363,17 @@ footer .brand-en{font-family:var(--font-display);color:var(--ink-3);letter-spaci
       </div>
     </div>
 
+    <div class="safety">
+      <h3>🛡 安全交换守则</h3>
+      <p class="lead">交换的前提是彼此放心。平台用「实名分级 + 线上留痕 + 举报」三道闸，把风险挡在接触之前。</p>
+      <div class="safety-grid">
+        <div class="safety-item"><span class="ic">✓</span><span><b>实名分级</b>：想约线下或发起私聊，必须先实名认证；未实名用户只能在广场公开交流。</span></div>
+        <div class="safety-item"><span class="ic">📹</span><span><b>线上优先</b>：交换在平台内置视频房间完成，<span class="warn">禁止留微信、私下转账、私下见面</span>。</span></div>
+        <div class="safety-item"><span class="ic">🛡</span><span><b>未成年人保护</b>：未成年用户只匹配同龄人，并需监护人授权。</span></div>
+        <div class="safety-item"><span class="ic">🚩</span><span><b>随时举报</b>：遇到骚扰、索要钱财、虚假技能，点卡片上的「举报」，风控团队会立即核查并冻结账号。</span></div>
+      </div>
+    </div>
+
     <div class="section">
       <div class="section-head">
         <h2 class="section-title">技能广场</h2>
@@ -400,10 +443,18 @@ footer .brand-en{font-family:var(--font-display);color:var(--ink-3);letter-spaci
     <h2 class="section-title">我的主页</h2>
     <div class="me-head">
       <div class="av">🧭</div>
-      <div>
-        <h2>我</h2>
+      <div style="flex:1">
+        <h2>我 <span class="v" id="myVerify"></span></h2>
         <p>这是你的演示身份。发布、删除技能都会实时更新匹配。</p>
       </div>
+      <button class="btn btn-ghost btn-sm" id="verifyBtn" onclick="verifyMe()">去实名认证</button>
+    </div>
+    <div class="coin-card">
+      <div>
+        <div class="bal"><span class="n" id="coinBal">0</span><span class="l">技能币</span></div>
+        <div class="note">结算时平台收取 15–20% 服务费 · 用于风险保障与撮合</div>
+      </div>
+      <button class="btn btn-amber btn-sm" onclick="topup()">＋ 充值（演示）</button>
     </div>
     <div class="stat-row">
       <div class="stat"><div class="n" id="statTeach">0</div><div class="l">我能教的技能</div></div>
@@ -423,6 +474,13 @@ footer .brand-en{font-family:var(--font-display);color:var(--ink-3);letter-spaci
   <span class="brand-en">Teach one, learn one.</span>
 </footer>
 
+<div class="modal-backdrop" id="modalBackdrop" onclick="if(event.target===this)closeModal()">
+  <div class="modal" role="dialog" aria-modal="true">
+    <h3 id="modalTitle"></h3>
+    <div class="m-body" id="modalBody"></div>
+  </div>
+</div>
+
 <div id="toast" role="status"></div>
 
 <script>
@@ -435,34 +493,34 @@ var ME_KEY = 'huhuan-me-v1';
 function s(t,c,l,tags){ return {t:t,c:c,l:l,tags:tags||[]}; }
 
 var SEED = [
-  {id:'u1',name:'林小满',avatar:'🎸',bio:'自学吉他三年，想转行做数据分析',
+  {id:'u1',name:'林小满',avatar:'🎸',bio:'自学吉他三年，想转行做数据分析',verified:true,
    teach:[s('吉他','音乐','入门',['指弹','和弦'])],
    learn:[s('Python','编程','入门',['自动化'])]},
-  {id:'u2',name:'大熊',avatar:'📷',bio:'前产品经理，转行做独立摄影',
+  {id:'u2',name:'大熊',avatar:'📷',bio:'前产品经理，转行做独立摄影',verified:true,
    teach:[s('摄影','艺术','进阶',['人像','构图','打光'])],
    learn:[s('Python','编程','入门',['爬虫'])]},
-  {id:'u3',name:'阿哲',avatar:'🎤',bio:'乐队吉他手，想学拍照记录演出',
+  {id:'u3',name:'阿哲',avatar:'🎤',bio:'乐队吉他手，想学拍照记录演出',verified:false,
    teach:[s('吉他','音乐','进阶',['即兴','扒谱']), s('尤克里里','音乐','入门',['弹唱'])],
    learn:[s('摄影','艺术','入门',['手机摄影'])]},
-  {id:'u4',name:'苏苏',avatar:'🗻',bio:'日语专业，N1 在读',
+  {id:'u4',name:'苏苏',avatar:'🗻',bio:'日语专业，N1 在读',verified:true,
    teach:[s('日语','语言','进阶',['口语','N1'])],
    learn:[s('水彩画','艺术','入门',['风景'])]},
-  {id:'u5',name:'陈老师',avatar:'🎨',bio:'中学美术老师，业余学日语',
+  {id:'u5',name:'陈老师',avatar:'🎨',bio:'中学美术老师，业余学日语',verified:true,
    teach:[s('水彩画','艺术','精通',['风景','静物'])],
    learn:[s('日语','语言','入门',['五十音'])]},
-  {id:'u6',name:'小叶',avatar:'🏃',bio:'尤克里里爱好者，跑步四年',
+  {id:'u6',name:'小叶',avatar:'🏃',bio:'尤克里里爱好者，跑步四年',verified:false,
    teach:[s('尤克里里','音乐','入门',['弹唱'])],
    learn:[s('马拉松','运动','入门',['配速'])]},
-  {id:'u7',name:'老周',avatar:'📊',bio:'十年数据分析师，想学粤语',
+  {id:'u7',name:'老周',avatar:'📊',bio:'十年数据分析师，想学粤语',verified:true,
    teach:[s('数据分析','编程','进阶',['Excel','SQL'])],
    learn:[s('粤语','语言','入门',['日常会话'])]},
-  {id:'u8',name:'Mia',avatar:'🥐',bio:'法语专业，烘焙新手',
+  {id:'u8',name:'Mia',avatar:'🥐',bio:'法语专业，烘焙新手',verified:false,
    teach:[s('法语','语言','进阶',['口语','语法'])],
    learn:[s('烘焙','生活','入门',['面包'])]}
 ];
 
 var DEFAULT_ME = {
-  name:'我', avatar:'🧭',
+  name:'我', avatar:'🧭', coins:12, verified:false,
   teach:[s('Python','编程','进阶',['数据分析','自动化'])],
   learn:[s('吉他','音乐','入门',['指弹']), s('摄影','艺术','入门',['手机摄影'])]
 };
@@ -511,6 +569,8 @@ function computeMatches(){
 /* ===== 渲染工具 ===== */
 function el(id){ return document.getElementById(id); }
 function esc(v){ return String(v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+function jsq(s){ return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
+function verifyChip(v){ return v ? ' <span class="v v-yes">✓ 实名</span>' : ' <span class="v v-no">未实名</span>'; }
 function skillCardHTML(sk, owner, isMe){
   var badge = sk.d === 'teach'
     ? '<span class="badge badge-teach">↗ 我能教</span>'
@@ -520,11 +580,12 @@ function skillCardHTML(sk, owner, isMe){
   (sk.tags||[]).slice(0,3).forEach(function(t){ tags += '<span class="tag">'+esc(t)+'</span>'; });
   var name = isMe ? '我' : owner.name;
   var av = isMe ? '🧭' : owner.avatar;
+  var v = isMe ? verifyChip(me.verified) : verifyChip(owner.verified);
   return '<article class="card">'+badge+
-    '<div class="owner"><span class="av">'+av+'</span>'+esc(name)+'<span class="want">· '+(isMe?'你的发布':esc(owner.bio||''))+'</span></div>'+
+    '<div class="owner"><span class="av">'+av+'</span>'+esc(name)+v+'<span class="want">· '+(isMe?'你的发布':esc(owner.bio||''))+'</span></div>'+
     '<h3 class="skill-title">'+esc(sk.t)+'</h3>'+
     '<div class="meta">'+tags+'</div>'+
-    '<div class="card-foot"><span></span><span class="want">'+(sk.d==='teach'?'可以教你':'想要学')+'</span></div>'+
+    '<div class="card-foot"><button class="report-btn" onclick="report(\''+jsq(name)+'\',\''+jsq(sk.t)+'\')">举报</button><span class="want">'+(sk.d==='teach'?'可以教你':'想要学')+'</span></div>'+
     '</article>';
 }
 
@@ -588,24 +649,24 @@ function renderMatches(){
       var give = m.give.map(function(x){return x.t;}).join('、');
       var get = m.get.map(function(x){return x.t;}).join('、');
       return '<article class="match-card swap">'+
-        '<div class="match-top"><span class="match-type">✓ 直接互换</span><button class="btn btn-primary btn-sm" onclick="invite(\''+o.id+'\')">发起互换</button></div>'+
-        '<div class="match-person"><span class="av">'+o.avatar+'</span><div><div class="nm">'+esc(o.name)+'</div><div class="bio">'+esc(o.bio)+'</div></div></div>'+
+        '<div class="match-top"><span class="match-type">✓ 直接互换</span><span class="m-tools"><button class="report-btn" onclick="report(\''+jsq(o.name)+'\')">举报</button><button class="btn btn-primary btn-sm" onclick="invite(\''+o.id+'\')">发起互换</button></span></div>'+
+        '<div class="match-person"><span class="av">'+o.avatar+'</span><div><div class="nm">'+esc(o.name)+verifyChip(o.verified)+'</div><div class="bio">'+esc(o.bio)+'</div></div></div>'+
         '<div class="exchange"><span class="from">你的 '+esc(give)+'</span><span class="arr">⇄</span><span class="to">TA 的 '+esc(get)+'</span></div>'+
         '<p class="match-why">你们正好能互相教：你教 TA 想学的，TA 教你想要的。无需技能币，约个时间即可。</p>'+
         '</article>';
     }else if(m.type==='coin-get'){
       var get2 = m.get.map(function(x){return x.t;}).join('、');
       return '<article class="match-card coin">'+
-        '<div class="match-top"><span class="match-type">🪙 技能币撮合 · TA 能教你</span><button class="btn btn-amber btn-sm" onclick="invite(\''+o.id+'\')">用技能币学</button></div>'+
-        '<div class="match-person"><span class="av">'+o.avatar+'</span><div><div class="nm">'+esc(o.name)+'</div><div class="bio">'+esc(o.bio)+'</div></div></div>'+
+        '<div class="match-top"><span class="match-type">🪙 技能币撮合 · TA 能教你</span><span class="m-tools"><button class="report-btn" onclick="report(\''+jsq(o.name)+'\')">举报</button><button class="btn btn-amber btn-sm" onclick="invite(\''+o.id+'\')">用技能币学</button></span></div>'+
+        '<div class="match-person"><span class="av">'+o.avatar+'</span><div><div class="nm">'+esc(o.name)+verifyChip(o.verified)+'</div><div class="bio">'+esc(o.bio)+'</div></div></div>'+
         '<div class="exchange"><span class="to">TA 的 '+esc(get2)+'</span></div>'+
         '<p class="match-why">TA 会教你想学的，但你没教 TA 想要的。教别人一次赚技能币，就能换这次学习。</p>'+
         '</article>';
     }else{
       var give2 = m.give.map(function(x){return x.t;}).join('、');
       return '<article class="match-card coin">'+
-        '<div class="match-top"><span class="match-type">🪙 技能币撮合 · 你能教 TA</span><button class="btn btn-amber btn-sm" onclick="invite(\''+o.id+'\')">去赚技能币</button></div>'+
-        '<div class="match-person"><span class="av">'+o.avatar+'</span><div><div class="nm">'+esc(o.name)+'</div><div class="bio">'+esc(o.bio)+'</div></div></div>'+
+        '<div class="match-top"><span class="match-type">🪙 技能币撮合 · 你能教 TA</span><span class="m-tools"><button class="report-btn" onclick="report(\''+jsq(o.name)+'\')">举报</button><button class="btn btn-amber btn-sm" onclick="invite(\''+o.id+'\')">去赚技能币</button></span></div>'+
+        '<div class="match-person"><span class="av">'+o.avatar+'</span><div><div class="nm">'+esc(o.name)+verifyChip(o.verified)+'</div><div class="bio">'+esc(o.bio)+'</div></div></div>'+
         '<div class="exchange"><span class="from">你的 '+esc(give2)+'</span></div>'+
         '<p class="match-why">TA 想学的正是你会教的。教一次，赚一枚技能币，攒着去学你想学的。</p>'+
         '</article>';
@@ -621,6 +682,11 @@ function renderMe(){
   el('statMatch').textContent = computeMatches().length;
   el('ownTeach').innerHTML = ownHTML('teach', me.teach);
   el('ownLearn').innerHTML = ownHTML('learn', me.learn);
+  el('coinBal').textContent = me.coins||0;
+  var mv = el('myVerify');
+  if(mv){ mv.className = 'v '+(me.verified?'v-yes':'v-no'); mv.textContent = me.verified?'✓ 已实名':'未实名'; }
+  var vb = el('verifyBtn');
+  if(vb){ vb.textContent = me.verified?'✓ 已实名':'去实名认证'; }
 }
 function ownHTML(dirKey, arr){
   if(!arr.length){ return '<div class="empty">还没有「'+(dirKey==='teach'?'我能教':'我想学')+'」的技能，点右上角「发布技能」添加。</div>'; }
@@ -659,9 +725,47 @@ function submitPublish(e){
   refreshSwapStage();
   switchView(dir==='teach'?'explore':'explore');
 }
+function openModal(title, bodyHTML){
+  el('modalTitle').textContent = title;
+  el('modalBody').innerHTML = bodyHTML;
+  el('modalBackdrop').classList.add('show');
+}
+function closeModal(){
+  el('modalBackdrop').classList.remove('show');
+}
 function invite(id){
   var u = SEED.find(function(x){return x.id===id;});
+  openModal('发起互换',
+    '<div class="safety-banner"><span class="ic">🛡</span><span>请在<b>平台内</b>完成交换：勿私下加微信、转账或单独见面；未成年人需监护人陪同。</span></div>'+
+    '<p style="margin:6px 0 0">你将向 <b>'+esc(u?u.name:'对方')+'</b> 发出互换邀请。</p>'+
+    '<div class="m-actions"><button class="btn btn-ghost btn-sm" onclick="closeModal()">取消</button><button class="btn btn-primary btn-sm" onclick="confirmInvite(\''+(u?u.id:'')+'\')">确认发起</button></div>'
+  );
+}
+function confirmInvite(id){
+  var u = SEED.find(function(x){return x.id===id;});
+  closeModal();
   toast('已向 '+(u?u.name:'对方')+' 发出互换邀请（演示）');
+}
+function report(who, what){
+  openModal('举报',
+    '<p style="margin:0 0 8px">'+(what?'举报 <b>'+esc(who)+'</b> 发布的「<b>'+esc(what)+'</b>」':'举报用户 <b>'+esc(who)+'</b>')+'</p>'+
+    '<select id="rpReason"><option value="骚扰/不当接触">骚扰 / 不当接触</option><option value="虚假技能">虚假技能</option><option value="索要钱财/诈骗">索要钱财 / 诈骗</option><option value="诱导线下见面">诱导线下见面</option><option value="其他">其他</option></select>'+
+    '<textarea id="rpNote" placeholder="补充说明（可选）" style="margin-top:10px"></textarea>'+
+    '<div class="m-actions"><button class="btn btn-ghost btn-sm" onclick="closeModal()">取消</button><button class="btn btn-primary btn-sm" onclick="submitReport()">提交举报</button></div>'
+  );
+}
+function submitReport(){
+  var r = el('rpReason').value;
+  closeModal();
+  toast('已收到「'+r+'」举报，风控团队将核查（演示）');
+}
+function verifyMe(){
+  me.verified = true; saveMe(); renderMe(); renderExplore();
+  toast('实名认证已通过（演示）');
+}
+function topup(){
+  me.coins = (me.coins||0) + 50; saveMe(); renderMe();
+  toast('充值成功，+50 技能币（演示）');
 }
 
 /* ===== 英雄区实时互换 ===== */
@@ -716,6 +820,13 @@ window.setCatFilter = setCatFilter;
 window.invite = invite;
 window.removeSkill = removeSkill;
 window.submitPublish = submitPublish;
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.confirmInvite = confirmInvite;
+window.report = report;
+window.submitReport = submitReport;
+window.verifyMe = verifyMe;
+window.topup = topup;
 })();
 </script>
 </body>
